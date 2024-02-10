@@ -43,27 +43,24 @@ params:
       de: "Siehe https://docs.evcc.io/docs/devices/vehicles#tesla"
   - name: vin
     example: W...
+  - name: uri
+    help:
+      generic: API endpoint
+    advanced: true
   - name: capacity
   - name: phases
     advanced: true
   - preset: vehicle-identify
 render: |
   type: tesla
-  {{- if .title }}
   title: {{ .title }}
-  {{- end }}
-  {{- if .icon }}
   icon: {{ .icon }}
-  {{- end }}
   tokens:
     access: {{ .accessToken }}
     refresh: {{ .refreshToken }}
   capacity: {{ .capacity }}
-  {{- if .phases }}
   phases: {{ .phases }}
-  {{- end }}
-  {{- if .vin }}
   vin: {{ .vin }}
-  {{- end }}
+  uri: {{ .uri }}
   {{ include "vehicle-identify" . }}
   features: ["coarsecurrent"]

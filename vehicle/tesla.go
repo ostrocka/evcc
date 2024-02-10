@@ -30,6 +30,7 @@ func NewTeslaFromConfig(other map[string]interface{}) (api.Vehicle, error) {
 	cc := struct {
 		embed  `mapstructure:",squash"`
 		Tokens Tokens
+		URI    string
 		VIN    string
 		Cache  time.Duration
 	}{
@@ -53,7 +54,15 @@ func NewTeslaFromConfig(other map[string]interface{}) (api.Vehicle, error) {
 	log := util.NewLogger("tesla").Redact(cc.Tokens.Access, cc.Tokens.Refresh)
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, request.NewClient(log))
 
-	client, err := tesla.NewClient(ctx, tesla.WithToken(token))
+	options := []tesla.ClientOption{
+		tesla.WithClient(oauth2.NewClient(ctx, oauth2.StaticTokenSource(token))),
+	}
+
+	if cc.URI != "" {
+		options = append(options, tesla.WithBaseURL(cc.URI))
+	}
+
+	client, err := tesla.NewClient(ctx, options...)
 	if err != nil {
 		return nil, err
 	}
